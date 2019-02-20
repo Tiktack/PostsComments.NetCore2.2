@@ -1,5 +1,4 @@
 ﻿using BusinessLayer;
-using Common;
 using DataLayer.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -12,7 +11,6 @@ using PostsCommentsApi.DTO;
 // ReSharper disable once IdentifierTypo
 namespace PostsCommentsApi.Controllers
 {
-    [ApiExceptionFilter]
     [Route("api/[controller]")]
     [ApiController]
     public class PostController : ControllerBase
