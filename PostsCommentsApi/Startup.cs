@@ -4,6 +4,7 @@ using DataLayer;
 using DataLayer.Interfaces;
 using DataLayer.Interfaces.Repositories;
 using DataLayer.Repositories;
+using Microsoft.AspNet.OData.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +26,14 @@ namespace PostsCommentsApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddOData();
+            services.AddDistributedRedisCache(options =>
+            {
+                options.Configuration = "localhost:6379";
+                options.InstanceName = "master";
+            });
+            #region swagger
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info
@@ -35,8 +43,10 @@ namespace PostsCommentsApi
                     Description = "ASP.NET Core Web API for Travix"
                 });
             });
-            services.AddDbContext<BaseContext>();
 
+            #endregion
+
+            services.AddDbContext<BaseContext>();
             RegisterDependencies(services);
         }
 
@@ -54,12 +64,20 @@ namespace PostsCommentsApi
             }
 
             app.UseHttpsRedirection();
-            app.UseMvc();
+            app.UseMvc(b =>
+            {
+                b.Count().Filter().OrderBy().Expand().Select().MaxTop(100);
+                b.EnableDependencyInjection();
+            });
+
+            #region swagger
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Test API V1");
             });
+            #endregion
+
         }
         private static void RegisterDependencies(IServiceCollection services)
         {

@@ -1,19 +1,20 @@
-﻿using BusinessLayer;
+﻿using AutoMapper;
+using BusinessLayer;
 using DataLayer.Entities;
+using Microsoft.AspNet.OData;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using PostsCommentsApi.DTO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
-using PostsCommentsApi.DTO;
 
 // ReSharper disable once IdentifierTypo
 namespace PostsCommentsApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PostController : ControllerBase
+    public class PostController : ODataController
     {
         private readonly IPostService _postService;
         private readonly ILogger<PostController> _logger;
@@ -28,6 +29,7 @@ namespace PostsCommentsApi.Controllers
 
         // GET: api/Post
         [HttpGet]
+        [EnableQuery]
         public async Task<IEnumerable<ViewPostDTO>> Get()
         {
             var posts = await _postService.GetAllPosts();
@@ -35,6 +37,7 @@ namespace PostsCommentsApi.Controllers
         }
 
         // GET: api/Post/{id}
+        [EnableQuery]
         [HttpGet("{id}")]
         public async Task<ViewPostDTO> Get(int id)
         {

@@ -5,6 +5,7 @@ using DataLayer.Interfaces;
 
 namespace DataLayer.Entities
 {
+    [Serializable]
     public class Post : IEntity
     {
         public int Id { get; set; }
