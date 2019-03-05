@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BusinessLayer;
+using Common;
 using DataLayer;
 using DataLayer.Interfaces;
 using DataLayer.Interfaces.Repositories;
@@ -7,10 +8,16 @@ using DataLayer.Repositories;
 using Microsoft.AspNet.OData.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Sinks.Elasticsearch;
 using Swashbuckle.AspNetCore.Swagger;
+using System;
 
 namespace PostsCommentsApi
 {
@@ -19,6 +26,14 @@ namespace PostsCommentsApi
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            Log.Logger = new LoggerConfiguration()
+                .Enrich.FromLogContext()
+                .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(Configuration["ElasticSearchHost"]))
+                {
+                    AutoRegisterTemplate = true
+                })
+                .CreateLogger();
         }
 
         public IConfiguration Configuration { get; }
@@ -30,7 +45,7 @@ namespace PostsCommentsApi
             services.AddOData();
             services.AddDistributedRedisCache(options =>
             {
-                options.Configuration = "localhost:6379";
+                options.Configuration = Configuration["RedisHost"];
                 options.InstanceName = "master";
             });
             #region swagger
@@ -45,13 +60,13 @@ namespace PostsCommentsApi
             });
 
             #endregion
-
-            services.AddDbContext<BaseContext>();
+            const string connection = @"Server=db;Database=TestDb;User=sa;Password=Your_password123;";
+            services.AddDbContext<BaseContext>(options => options.UseSqlServer(connection));
             RegisterDependencies(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             if (env.IsDevelopment())
             {
@@ -62,13 +77,15 @@ namespace PostsCommentsApi
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
+            loggerFactory.AddSerilog();
             app.UseHttpsRedirection();
             app.UseMvc(b =>
             {
                 b.Count().Filter().OrderBy().Expand().Select().MaxTop(100);
                 b.EnableDependencyInjection();
             });
+
+            app.UpdateDatabase();
 
             #region swagger
             app.UseSwagger();
@@ -81,11 +98,14 @@ namespace PostsCommentsApi
         }
         private static void RegisterDependencies(IServiceCollection services)
         {
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddAutoMapper();
             services.AddTransient<IPostService, PostService>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddTransient<ICommentRepository, CommentRepository>();
             services.AddTransient<IPostRepository, PostRepository>();
         }
+
+
     }
 }

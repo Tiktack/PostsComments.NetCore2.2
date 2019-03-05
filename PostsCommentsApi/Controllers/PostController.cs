@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System;
+using AutoMapper;
 using BusinessLayer;
 using DataLayer.Entities;
 using Microsoft.AspNet.OData;
@@ -32,6 +33,7 @@ namespace PostsCommentsApi.Controllers
         [EnableQuery]
         public async Task<IEnumerable<ViewPostDTO>> Get()
         {
+            _logger.LogInformation($"oh hai there! : {DateTime.UtcNow}");
             var posts = await _postService.GetAllPosts();
             return posts.Select(post => _mapper.Map<ViewPostDTO>(post));
         }
