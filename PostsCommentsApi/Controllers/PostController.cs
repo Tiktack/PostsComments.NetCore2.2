@@ -1,10 +1,8 @@
-﻿using System;
-using AutoMapper;
+﻿using AutoMapper;
 using BusinessLayer;
 using DataLayer.Entities;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using PostsCommentsApi.DTO;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,13 +16,11 @@ namespace PostsCommentsApi.Controllers
     public class PostController : ODataController
     {
         private readonly IPostService _postService;
-        private readonly ILogger<PostController> _logger;
         private readonly IMapper _mapper;
 
-        public PostController(IPostService postService, ILogger<PostController> logger, IMapper mapper)
+        public PostController(IPostService postService, IMapper mapper)
         {
             _postService = postService;
-            _logger = logger;
             _mapper = mapper;
         }
 
@@ -33,7 +29,6 @@ namespace PostsCommentsApi.Controllers
         [EnableQuery]
         public async Task<IEnumerable<ViewPostDTO>> Get()
         {
-            _logger.LogInformation($"oh hai there! : {DateTime.UtcNow}");
             var posts = await _postService.GetAllPosts();
             return posts.Select(post => _mapper.Map<ViewPostDTO>(post));
         }
