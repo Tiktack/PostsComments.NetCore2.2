@@ -13,7 +13,7 @@ services:
       - elasticsearch
     environment:
        - RedisHost=cache:6379
-       - ElasticSearchHost=elasticsearch:9200
+       - ElasticSearchHost=http://elasticsearch:9200
     networks:
     - api-network
 

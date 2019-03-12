@@ -16,7 +16,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Sinks.Elasticsearch;
-using Swashbuckle.AspNetCore.Swagger;
 using System;
 
 namespace PostsCommentsApi
@@ -34,6 +33,10 @@ namespace PostsCommentsApi
                     AutoRegisterTemplate = true
                 })
                 .CreateLogger();
+
+
+            // Uncomment if Serilog is not working
+            // Serilog.Debugging.SelfLog.Enable(msg => Debug.WriteLine(msg));
         }
 
         public IConfiguration Configuration { get; }
@@ -48,20 +51,8 @@ namespace PostsCommentsApi
                 options.Configuration = Configuration["RedisHost"];
                 options.InstanceName = "master";
             });
-            #region swagger
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new Info
-                {
-                    Version = "v1",
-                    Title = "Test API",
-                    Description = "ASP.NET Core Web API for Travix"
-                });
-            });
 
-            #endregion
-            const string connection = @"Server=db;Database=TestDb;User=sa;Password=Your_password123;";
-            services.AddDbContext<BaseContext>(options => options.UseSqlServer(connection));
+            services.AddDbContext<BaseContext>(options => options.UseSqlServer(Configuration["ConnectionString"]));
             RegisterDependencies(services);
         }
 
@@ -86,14 +77,6 @@ namespace PostsCommentsApi
             });
 
             app.UpdateDatabase();
-
-            #region swagger
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Test API V1");
-            });
-            #endregion
 
         }
         private static void RegisterDependencies(IServiceCollection services)

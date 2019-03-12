@@ -7,6 +7,7 @@ using PostsCommentsApi.DTO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 // ReSharper disable once IdentifierTypo
 namespace PostsCommentsApi.Controllers
@@ -17,11 +18,13 @@ namespace PostsCommentsApi.Controllers
     {
         private readonly IPostService _postService;
         private readonly IMapper _mapper;
+        private readonly ILogger<PostController> _logger;
 
-        public PostController(IPostService postService, IMapper mapper)
+        public PostController(IPostService postService, IMapper mapper, ILogger<PostController> logger)
         {
             _postService = postService;
             _mapper = mapper;
+            _logger = logger;
         }
 
         // GET: api/Post
