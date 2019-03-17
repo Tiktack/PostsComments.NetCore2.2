@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
-namespace PostsCommentsApi
+namespace Identity
 {
     public class Program
     {

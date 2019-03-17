@@ -1,10 +1,16 @@
-﻿using AutoMapper;
+﻿using System;
+using AutoMapper;
 using BusinessLayer;
 using Common;
+using CommonHttp;
+using CommonHttp.Interfaces;
+using CommonHttp.Serializers;
+using CommonHttp.Serializers.Interfaces;
 using DataLayer;
 using DataLayer.Interfaces;
 using DataLayer.Interfaces.Repositories;
 using DataLayer.Repositories;
+using Identity.Controllers;
 using Microsoft.AspNet.OData.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -16,7 +22,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Sinks.Elasticsearch;
-using System;
 
 namespace PostsCommentsApi
 {
@@ -54,20 +59,16 @@ namespace PostsCommentsApi
 
             services.AddDbContext<BaseContext>(options => options.UseSqlServer(Configuration["ConnectionString"]));
             RegisterDependencies(services);
+            RegisterDependenciesForWebServices(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             if (env.IsDevelopment())
-            {
                 app.UseDeveloperExceptionPage();
-            }
             else
-            {
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
-            }
             loggerFactory.AddSerilog();
             app.UseHttpsRedirection();
             app.UseMvc(b =>
@@ -77,8 +78,8 @@ namespace PostsCommentsApi
             });
 
             app.UpdateDatabase();
-
         }
+
         private static void RegisterDependencies(IServiceCollection services)
         {
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -89,6 +90,15 @@ namespace PostsCommentsApi
             services.AddTransient<IPostRepository, PostRepository>();
         }
 
-
+        private static void RegisterDependenciesForWebServices(IServiceCollection services)
+        {
+            services.AddTransient<IContentSerializer, JsonSerializer>();
+            services.AddTransient<IContentSerializer, TextPlainSerializer>();
+            services.AddTransient<IContentSerializerFactory, ContentSerializerFactory>();
+            services.AddTransient<IHttpClientRest, HttpClientRest>();
+            services
+                .AddTransient<IGeneratorWebServiceProxy<IIdentityContract>, GeneratorWebServiceProxy<IIdentityContract>
+                >();
+        }
     }
 }

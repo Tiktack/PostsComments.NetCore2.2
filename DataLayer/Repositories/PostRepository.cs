@@ -1,9 +1,9 @@
-﻿using DataLayer.Entities;
-using DataLayer.Interfaces.Repositories;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using DataLayer.Entities;
+using DataLayer.Interfaces.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataLayer.Repositories
 {
@@ -15,6 +15,7 @@ namespace DataLayer.Repositories
         {
             _context = context;
         }
+
         public async Task Insert(Post item)
         {
             await _context.Posts.AddAsync(item);

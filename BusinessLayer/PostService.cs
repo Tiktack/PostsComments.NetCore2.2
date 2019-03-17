@@ -1,17 +1,17 @@
-﻿using DataLayer.Entities;
-using DataLayer.Interfaces;
-using Microsoft.Extensions.Caching.Distributed;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Common;
+using DataLayer.Entities;
+using DataLayer.Interfaces;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace BusinessLayer
 {
     public class PostService : IPostService
     {
-        private readonly IUnitOfWork _unitOfWork;
         private readonly IDistributedCache _distributedCache;
+        private readonly IUnitOfWork _unitOfWork;
 
         public PostService(IUnitOfWork unitOfWork, IDistributedCache distributedCache)
         {
@@ -31,26 +31,21 @@ namespace BusinessLayer
 
             var cacheKey = $"post:{id}";
             var cacheValue = await _distributedCache.GetAsync(cacheKey);
-            if (cacheValue != null)
-            {
-                return cacheValue.FromByteArray<Post>();
-            }
+            if (cacheValue != null) return cacheValue.FromByteArray<Post>();
             var result = await _unitOfWork.PostRepository.GetById(id) ?? throw new ArgumentException();
-            await _distributedCache.SetAsync(cacheKey, result.ToByteArray(), new DistributedCacheEntryOptions { AbsoluteExpiration = DateTime.Now.AddMinutes(2) });
+            await _distributedCache.SetAsync(cacheKey, result.ToByteArray(),
+                new DistributedCacheEntryOptions {AbsoluteExpiration = DateTime.Now.AddMinutes(2)});
             return result;
-
         }
 
         public async Task<IEnumerable<Post>> GetAllPosts()
         {
             const string cacheKey = "allPosts";
             var cacheValue = await _distributedCache.GetAsync(cacheKey);
-            if (cacheValue != null)
-            {
-                return cacheValue.FromByteArray<IEnumerable<Post>>();
-            }
+            if (cacheValue != null) return cacheValue.FromByteArray<IEnumerable<Post>>();
             var result = await _unitOfWork.PostRepository.GetAll();
-            await _distributedCache.SetAsync(cacheKey, result.ToByteArray(), new DistributedCacheEntryOptions { AbsoluteExpiration = DateTime.Now.AddMinutes(2) });
+            await _distributedCache.SetAsync(cacheKey, result.ToByteArray(),
+                new DistributedCacheEntryOptions {AbsoluteExpiration = DateTime.Now.AddMinutes(2)});
             return result;
         }
 
