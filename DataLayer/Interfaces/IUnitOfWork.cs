@@ -1,5 +1,5 @@
-﻿using DataLayer.Interfaces.Repositories;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using DataLayer.Interfaces.Repositories;
 
 namespace DataLayer.Interfaces
 {

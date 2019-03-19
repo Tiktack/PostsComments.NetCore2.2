@@ -2,7 +2,6 @@ version: '3.4'
 
 services:
   postscommentsapi:
-    image: ${DOCKER_REGISTRY-}postscommentsapi
     container_name: api
     build:
       context: .
@@ -11,11 +10,39 @@ services:
       - cache
       - db
       - elasticsearch
+      - identity
     environment:
-       - RedisHost=cache:6379
-       - ElasticSearchHost=http://elasticsearch:9200
+      - RedisHost=cache:6379
+      - ElasticSearchHost=http://elasticsearch:9200
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_HTTPS_PORT=30001
+    ports:
+      - "30000:80"
+      - "30001:443"
+    volumes:
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
     networks:
-    - api-network
+      - api-network
+
+  identity:
+    container_name: identity
+    build:
+      context: .
+      dockerfile: Identity/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_HTTPS_PORT=5101
+    ports:
+      - "5100:80"
+      - "5101:443"
+    volumes:
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+    networks:
+      - api-network
 
   cache:
     image: redis
@@ -23,7 +50,7 @@ services:
     ports:
       - "5001:6379"
     networks:
-    - api-network
+      - api-network
 
   db:
     image: "mcr.microsoft.com/mssql/server"
@@ -44,7 +71,7 @@ services:
     volumes:
     - elasticsearch-data:/usr/share/elasticsearch/data
     networks:
-    - api-network
+      - api-network
 
   kibana:
     image: docker.elastic.co/kibana/kibana:6.6.1
@@ -54,7 +81,7 @@ services:
     depends_on:
     - elasticsearch
     networks:
-    - api-network
+      - api-network
 networks:
   api-network:
     driver: bridge

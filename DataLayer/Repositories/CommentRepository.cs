@@ -1,9 +1,9 @@
-﻿using DataLayer.Entities;
-using DataLayer.Interfaces.Repositories;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using DataLayer.Entities;
+using DataLayer.Interfaces.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataLayer.Repositories
 {
