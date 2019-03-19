@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.136
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28711.60
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PostsCommentsApi", "PostsCommentsApi\PostsCommentsApi.csproj", "{877E63B4-1D11-49E9-8851-E90B01BC4978}"
 EndProject
@@ -21,7 +21,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web.Identity", "Web.Identit
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{F71FC1AB-4939-4A3E-BCBB-27ABC1925E07}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonHttp", "..\CommonHttp\CommonHttp.csproj", "{557FFC4A-6E21-402F-8106-F3699A5B4B63}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonHttp", "..\CommonHttp\CommonHttp.csproj", "{557FFC4A-6E21-402F-8106-F3699A5B4B63}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Email", "Email", "{21551068-66FC-49C5-B1CD-B02A2002A403}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
